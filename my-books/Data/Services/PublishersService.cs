@@ -1,4 +1,5 @@
 ﻿using my_books.Data.Models;
+using my_books.Data.Paging;
 using my_books.Data.ViewModels;
 using my_books.Exeptions;
 using System;
@@ -15,6 +16,30 @@ namespace my_books.Data.Services
         public PublishersService(AppDbContext context)
         {
             _context = context;
+        }
+        public List<Publisher>getAllPublishers(string sortby , string searchstring ,int ? pageNumber)
+        {
+            var result = _context.Publishers.OrderBy(n => n.Name).ToList();
+            if (!string.IsNullOrEmpty(sortby))
+            {
+                switch (sortby)
+                {
+                    case "name_desc":
+                        result = result.OrderByDescending(n => n.Name).ToList();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (!string.IsNullOrEmpty(searchstring))
+            {
+                result = result.Where(n => n.Name.Contains(searchstring,StringComparison.CurrentCultureIgnoreCase)).ToList();
+            }
+
+            //Paging - helper class for getting page number data -
+            int pageSize = 5;
+            result = PaginatedList<Publisher>.Create(result.AsQueryable(), pageNumber ?? 1, pageSize);
+            return result;
         }
 
         public Publisher AddPublisher(PublisherVM publisher)
