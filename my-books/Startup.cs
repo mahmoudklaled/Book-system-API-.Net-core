@@ -22,6 +22,7 @@ namespace my_books
         public string ConnectionString { get; set; }
         public Startup(IConfiguration configuration)
         {
+            
             Configuration = configuration;
             ConnectionString = Configuration.GetConnectionString("DefaultConnectionString");
         }
